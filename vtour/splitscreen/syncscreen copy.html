@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Screen Sync Tours</title>
+    <style>
+        body { margin: 0px; }
+        .tour-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .krpano-tour {
+            width: 49.9%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Two Krpano Tour Containers -->
+    <div class="tour-container">
+        <div id="pano1" class="krpano-tour"></div>
+        <div id="pano2" class="krpano-tour"></div>
+    </div>
+
+    <script src="../tour.js"></script>
+ 
+    <script>
+        let krpano1Ready = false;
+        let krpano2Ready = false;
+
+        window.onload = function() {
+
+			// Get URL parameters for scene and view
+			const urlParams = new URLSearchParams(window.location.search);
+			const scene = urlParams.get('scene') || 'scene_1';
+			const hlookat = urlParams.get('hlookat') || 0;
+			const vlookat = urlParams.get('vlookat') || 0;
+			const fov = urlParams.get('fov') || 90;
+
+
+            // Load the first tour
+            embedpano({
+                swf: "https://app.siteview.ai/output/360videohome18/vtour/tour.swf",
+                xml: "https://app.siteview.ai/output/360videohome18/vtour/tour.xml",
+				//xml: "pano1.xml",
+                target: "pano1",
+                html5: "prefer",
+                passQueryParameters: true,
+                onready: function(krpano1) {
+                    window.krpano1 = krpano1; // Store the krpano instance globally
+                    krpano1.set("name", "krpano1");  // Set the name for identification
+					krpano1.set('view.hlookat', hlookat);
+					krpano1.set('view.vlookat', vlookat);
+					krpano1.set('view.fov', fov);
+
+                    krpano1Ready = true;
+                    checkSyncReady();  // Check if both viewers are ready
+                }
+            });
+
+
+            // Load the second tour
+            embedpano({
+                swf: "https://app.siteview.ai/output/360videohome17/vtour/tour.swf",
+                xml: "https://app.siteview.ai/output/360videohome17/vtour/tour.xml",
+				//xml: "pano2.xml",
+                target: "pano2",
+                html5: "prefer",
+                passQueryParameters: true,
+                onready: function(krpano2) {
+                    window.krpano2 = krpano2; // Store the krpano instance globally
+                    krpano2.set("name", "krpano2");  // Set the name for identification
+					krpano2Ready = true;
+                    checkSyncReady();  // Check if both viewers are ready
+                }
+            });
+        }
+
+        function checkSyncReady() {
+            if (krpano1Ready && krpano2Ready) {
+                console.log("Both viewers are ready for syncing.");
+            }
+        }
+    </script>
+
+</body>
+</html>

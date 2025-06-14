@@ -1,0 +1,348 @@
+<krpano>
+    <!-- Overlay/Backdrop -->
+    <layer name="popup_overlay" type="container" 
+           keep="true"
+           visible="false"
+           align="lefttop"
+           width="100%" height="100%"
+           bgcolor="0x000000"
+           bgalpha="0.5"
+           enabled="true"
+           onclick="hide_popup();"
+           zorder="99999"
+           overflow="scroll" scrollwidth="8" scrollheight="100%" scrollinertia="0.9"
+           />
+
+    <!-- Add Note Popup Components -->
+    <layer name="add_note_popup" type="container" keep="true" align="center" width="600" height="800" bgcolor="0xFFFFFF" bgalpha="1.0" visible="false" maskchildren="true" zorder="999999" bgroundedge="10">
+        <!-- Popup Header -->
+        <layer name="popup_header" type="text" html="Add Site Note" css="font-family:Arial; font-size:24px; color:#000000;" align="lefttop" x="20" y="15" />
+        
+        <!-- Close Button -->
+        <layer name="close_button" type="text" 
+               html="×" 
+               css="font-family:Arial; font-size:32px; color:#000000; cursor:pointer;" 
+               align="righttop" 
+               x="20" y="5" 
+               onclick="hide_popup();" />
+
+        <!-- Left Side Container -->
+        <layer name="left_image_container" type="container" 
+               align="lefttop" x="20" y="50" 
+               width="270" height="200" 
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xFFFFFF" bgroundedge="10"/>
+
+        <!-- Right Side Container -->
+        <layer name="right_image_container" type="container" 
+               align="lefttop" x="310" y="50" 
+               width="270" height="200" 
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xFFFFFF" bgroundedge="10"/>
+
+        <!-- Left Side Text Areas -->
+        <layer name="comment_input" type="textfield" 
+               align="lefttop" x="20" y="260" 
+               width="270" height="410" 
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               css="font-family:Arial; font-size:14px; color:#000000;"
+               enabled="true" editable="true" editmode="true"
+               textalign="topleft" padding="10" multiline="true"
+               ondown="if(selected,0,focusInput(get(name)));"
+               />
+
+        <layer name="write_comment" type="textfield" 
+               align="lefttop" x="20" y="680" 
+               width="270" height="35" html="Write a comment..."
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               css="font-family:Arial; font-size:14px; color:#000000;"
+               enabled="true" editable="true" editmode="true"
+               textalign="left" padding="10"
+               ondown="if(selected,0,focusInput(get(name)));"
+               />
+
+        <!-- Right Side Form Elements -->
+        <layer name="subject_label" type="text" html="Subject" css="font-family:Arial; font-size:14px; color:#000000;" align="lefttop" x="310" y="260" />
+        <layer name="subject_input" type="textfield" 
+               align="lefttop" x="310" y="280" 
+               width="270" height="35" html="Add Subject"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               css="font-family:Arial; font-size:14px; color:#000000;"
+               enabled="true" editable="true" editmode="true"
+               textalign="left" padding="10"
+               ondown="if(selected,0,focusInput(get(name)));"
+               />
+
+        <layer name="description_label" type="text" html="Description" css="font-family:Arial; font-size:14px; color:#000000;" align="lefttop" x="310" y="325" />
+        <layer name="description_input" type="textfield" 
+               align="lefttop" x="310" y="345" 
+               width="270" height="60" html="Add Description"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               css="font-family:Arial; font-size:14px; color:#000000;"
+               enabled="true" editable="true" editmode="true"
+               textalign="topleft" padding="10" multiline="true"
+               ondown="if(selected,0,focusInput(get(name)));"
+               />
+
+        <!-- Status Section -->
+        <layer name="status_label" type="text" 
+               html="Status" 
+               css="font-family:Arial; font-size:14px; color:#000000;" 
+               align="lefttop" x="310" y="415" />
+
+        <!-- Status Dropdown Container -->
+        <layer name="status_container" type="container"
+               align="lefttop" x="310" y="435"
+               width="270" height="35"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               zorder="999999">
+            
+            <!-- Selected Status Display -->
+            <layer name="status_display" type="text"
+                   html="Select Status"
+                   css="font-family:Arial; font-size:14px; color:#000000;"
+                   align="lefttop"
+                   x="10" y="8"
+                   width="230"
+                   enabled="true" 
+                   onclick="toggle_status_options();"/>
+            
+            <!-- Dropdown Arrow -->
+            <layer name="dropdown_arrow" type="text"
+                   html="▼"
+                   css="font-family:Arial; font-size:12px; color:#666666;"
+                   align="righttop"
+                   x="10" y="10"
+                   enabled="true" />
+        </layer>
+
+        <!-- Options Container (Separate from status_container) -->
+        <layer name="status_options" type="container"
+               align="lefttop"
+               x="310" y="470"
+               width="270"
+               height="200"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10" bgshadow="0x000000" bgshadowalpha="2"
+               visible="false"
+               maskchildren="true"
+               zorder="1000000"
+               onclick="set_status(get(status_value));">
+            
+            <layer name="option_complete" type="text"
+                   html="✓ Complete"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="0"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('Complete');" />
+            
+            <layer name="option_progress" type="text"
+                   html="In Progress"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="35"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('In Progress');" />
+            
+            <layer name="option_high" type="text"
+                   html="High Priority"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="70"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('High Priority');" />
+            
+            <layer name="option_open" type="text"
+                   html="Open"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="105"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('Open');" />
+            
+            <layer name="option_dispute" type="text"
+                   html="Dispute"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="140"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('Dispute');" />
+            
+            <layer name="option_low" type="text"
+                   html="Low Priority"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="175"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_status('Low Priority');" />
+        </layer>
+
+        <!-- Bottom Row Elements -->
+        <layer name="due_date_label" type="text" html="Due Date" css="font-family:Arial; font-size:14px; color:#000000;" align="lefttop" x="310" y="480" />
+        <layer name="due_date_input" type="textfield" 
+               align="lefttop" x="310" y="500" 
+               width="270" height="35" 
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               css="font-family:Arial; font-size:14px; color:#000000;"
+               enabled="true" editable="true" editmode="true"
+               textalign="left" padding="10"
+               ondown="if(selected,0,focusInput(get(name)));"
+               />
+
+        <!-- Collaborators Section -->
+        <layer name="collaborators_label" type="text" 
+               html="Collaborators" 
+               css="font-family:Arial; font-size:14px; color:#000000;" 
+               align="lefttop" x="310" y="545" />
+
+        <!-- Collaborators Dropdown Container -->
+        <layer name="collaborators_container" type="container"
+               align="lefttop" x="310" y="565"
+               width="270" height="35"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10"
+               zorder="999999">
+            
+            <!-- Selected Collaborator Display -->
+            <layer name="collaborators_display" type="text"
+                   html="Select Collaborator"
+                   css="font-family:Arial; font-size:14px; color:#000000;"
+                   align="lefttop"
+                   x="10" y="8"
+                   width="230"
+                   enabled="true"
+                   onclick="toggle_collaborators_options();" />
+            
+            <!-- Dropdown Arrow -->
+            <layer name="collaborators_arrow" type="text"
+                   html="▼"
+                   css="font-family:Arial; font-size:12px; color:#666666;"
+                   align="righttop"
+                   x="10" y="10"
+                   enabled="true" />
+        </layer>
+
+        <!-- Collaborators Options Container -->
+        <layer name="collaborators_options" type="container"
+               bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10" bgshadow="0x000000" bgshadowalpha="2"
+               align="lefttop"
+               x="310" y="600"
+               width="270"
+               height="140"
+               visible="false"
+               maskchildren="true"
+               zorder="1000000">
+            
+            <layer name="collab_user1" type="text"
+                   html="John Smith"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="0"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_collaborator('John Smith');" />
+            
+            <layer name="collab_user2" type="text"
+                   html="Sarah Johnson"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="35"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_collaborator('Sarah Johnson');" />
+            
+            <layer name="collab_user3" type="text"
+                   html="Mike Wilson"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="70"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_collaborator('Mike Wilson');" />
+            
+            <layer name="collab_user4" type="text"
+                   html="Emily Brown"
+                   css="font-family:Arial; font-size:14px; color:#666666; cursor:pointer; hover:background-color:#888888;"
+                   align="lefttop"
+                   x="0" y="105"
+                   width="100%" height="35"
+                   padding="10"
+                   enabled="true"
+                   onclick="set_collaborator('Emily Brown');" />
+            
+        </layer>
+
+        <!-- Attachment Section -->
+        <layer name="attachment_label" type="text" html="Add attachment" css="font-family:Arial; font-size:14px; color:#000000;" align="lefttop" x="310" y="615" />
+        <layer name="attachment_area" type="container" align="lefttop" x="310" y="635" width="270" height="80" bgcolor="0xFFFFFF" bgborder="1" bgbordercolor="0xCCCCCC" bgroundedge="10">
+            <layer name="upload_icon" type="text" html="🔄" css="font-family:Arial; font-size:20px; color:#666666; text-align:center;" align="center" y="10" />
+            <layer name="upload_text" type="text" html="Choose an upload option to get started." css="font-family:Arial; font-size:12px; color:#666666; text-align:center;" align="center" y="35" />
+            <layer name="upload_button" type="text" 
+                   html="Upload Image" 
+                   css="font-family:Arial; font-size:14px; color:#FFFFFF; text-align:center; background-color:#1a1f36; padding:8px 16px; border-radius:5px; cursor:pointer;" 
+                   align="center" y="60" />
+        </layer>
+        
+        <!-- Submit Button -->
+        <layer name="submit_button" type="text" 
+               html="Add site note" 
+               css="font-family:Arial; font-size:16px; color:#FFFFFF; text-align:center; background-color:#1a1f36; padding:10px 20px; border-radius:5px; cursor:pointer;" 
+               align="center" 
+               y="375" 
+               x="0"
+               onclick="add_site_note();" />
+    </layer>
+
+    <!-- Actions -->
+    <action name="show_add_note_popup">
+        set(layer[popup_overlay].visible, true);
+        set(layer[add_note_popup].visible, true);
+    </action>
+
+    <action name="hide_popup">
+        set(layer[popup_overlay].visible, false);
+        set(layer[add_note_popup].visible, false);
+    </action>
+
+    <action name="add_site_note">
+        set(layer[popup_overlay].visible, false);
+        set(layer[add_note_popup].visible, false);
+    </action>
+
+    <!-- Add these actions -->
+    <action name="toggle_status_options">
+        if(layer[status_options].visible,
+            set(layer[status_options].visible, false),
+            set(layer[status_options].visible, true)
+        );
+    </action>
+
+    <action name="set_status">
+        set(layer[status_display].html, %1);
+        set(layer[status_options].visible, false);
+    </action>
+
+    <action name="toggle_collaborators_options">
+        if(layer[collaborators_options].visible,
+            set(layer[collaborators_options].visible, false),
+            set(layer[collaborators_options].visible, true)
+        );
+    </action>
+
+    <action name="set_collaborator">
+        set(layer[collaborators_display].html, %1);
+        set(layer[collaborators_options].visible, false);
+    </action>
+</krpano> 

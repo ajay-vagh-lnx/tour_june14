@@ -1,0 +1,32 @@
+<krpano>
+    <events name="sync" keep="true"
+        onmousedown="sync_to_other_viewer();"
+        onmousewheel="sync_to_other_viewer();"
+        oncontextmenu="sync_to_other_viewer();"
+        onviewchange="sync_to_other_viewer();"
+    />
+
+    <action name="sync_to_other_viewer" type="Javascript"><![CDATA[
+        var currentViewer = krpano.get("name");
+        var otherViewer;
+        
+        if (currentViewer === 'krpano1') {
+            otherViewer = window.krpano2;
+        } else {
+            otherViewer = window.krpano1;
+        }
+        
+        if (otherViewer) {
+            var view2_hlookat = krpano.get('view.hlookat');
+            var view2_vlookat = krpano.get('view.vlookat');
+            var view2_fov = krpano.get('view.fov');
+            
+            
+            
+            // Apply the view from the current krpano to the other krpano
+            otherViewer.set('view.hlookat', view2_hlookat);
+            otherViewer.set('view.vlookat', view2_vlookat);
+            otherViewer.set('view.fov', view2_fov);
+        }
+    ]]></action>
+</krpano>

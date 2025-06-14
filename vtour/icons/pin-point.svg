@@ -1,0 +1,16 @@
+<svg width="40" height="52" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_49_13)">
+<foreignObject x="-26.6667" y="-26.6667" width="93.3334" height="105"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(13.33px);clip-path:url(#bgblur_1_49_13_clip_path);height:100%;width:100%"></div></foreignObject><path data-figma-bg-blur-radius="26.6667" fill-rule="evenodd" clip-rule="evenodd" d="M25.3251 42.4434C26.7989 39.8907 29.1681 38.0222 31.5709 36.315C36.672 32.6907 40 26.734 40 20C40 8.95431 31.0457 0 20 0C8.9543 0 0 8.95431 0 20C0 26.734 3.32806 32.6907 8.42912 36.315C10.832 38.0222 13.2012 39.8907 14.675 42.4434L20 51.6667L25.3251 42.4434Z" fill="black" fill-opacity="0.2"/>
+<path d="M36.3333 19.6666C36.3333 10.4619 28.8714 3 19.6667 3C10.4619 3 3 10.4619 3 19.6666C3 28.8714 10.4619 36.3333 19.6667 36.3333C28.8714 36.3333 36.3333 28.8714 36.3333 19.6666Z" fill="#DFFF60"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M21.9482 11.9678H16.4041C14.6707 11.9611 13.2499 13.3428 13.2091 15.0753V24.0028C13.1707 25.7637 14.5666 27.2228 16.3274 27.262C16.3532 27.262 16.3782 27.2628 16.4041 27.262H23.0616C24.8066 27.1912 26.1816 25.7495 26.1691 24.0028V16.3645L21.9482 11.9678Z" stroke="#111827" stroke-width="1.05769" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.7292 11.958V14.3822C21.7292 15.5655 22.6859 16.5247 23.8692 16.528H26.165" stroke="#111827" stroke-width="1.05769" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.5735 22.4645H17.0735" stroke="#111827" stroke-width="1.05769" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.8694 19.3376H17.0727" stroke="#111827" stroke-width="1.05769" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="bgblur_1_49_13_clip_path" transform="translate(26.6667 26.6667)"><path fill-rule="evenodd" clip-rule="evenodd" d="M25.3251 42.4434C26.7989 39.8907 29.1681 38.0222 31.5709 36.315C36.672 32.6907 40 26.734 40 20C40 8.95431 31.0457 0 20 0C8.9543 0 0 8.95431 0 20C0 26.734 3.32806 32.6907 8.42912 36.315C10.832 38.0222 13.2012 39.8907 14.675 42.4434L20 51.6667L25.3251 42.4434Z"/>
+</clipPath><clipPath id="clip0_49_13">
+<rect width="40" height="52" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Screen Sync Tours</title>
+    <style>
+        body { margin: 0px; }
+        .tour-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative; /* Add this */
+        }
+        .krpano-tour {
+            width: 49.9%;
+            height: 100vh;
+        }
+
+        /* LOADERRRR */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+            font-family: 'Segoe UI', sans-serif;
+          }
+          
+          .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eee;
+            border-top: 5px solid #ABDD05;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+          }
+          
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+          
+          .loader-text {
+            color: #000;
+            font-size: 16px;
+          }
+          
+          .loader-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+          }
+    </style>
+</head>
+<body>
+
+    <!-- ADDED LOADER HTML (NEW) -->
+    <!-- <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">Preparing 360° split-screen view for you...</p>
+    </div> -->
+    
+    <!-- Two Krpano Tour Containers -->
+    <div class="tour-container">
+        <div id="pano1" class="krpano-tour"></div>
+        <div id="pano2" class="krpano-tour"></div>
+    </div>
+
+    <script src="../tour.js"></script>
+    <script src="../screenshot/FileSaver.js"></script>
+    <script src="../slam-non-modular/krpano_main_splitscreen.js"></script>
+    <script src="../slam-non-modular/logic.js"></script>
+    <script src="../slam-non-modular/trajectoryData.js"></script>
+    <script src="../slam-non-modular/createTrajectoryLine.js"></script>
+    <script src="../slam-non-modular/createSphere.js"></script>
+    <script src="../slam-non-modular/utilities.js"></script>
+    <script src="../slam-non-modular/navigateToClickedPoint.js"></script>
+    <script src="../slam-non-modular/raycasterMouseHandler.js"></script>
+    <script src="../slam-non-modular/addKrpanoListeners.js"></script>
+ 
+    <script>
+
+       
+        let krpano1Ready = false;
+        let krpano2Ready = false;
+        window.krpanoWrapper = {
+            krpano1: null,
+            krpano2: null
+        };
+    
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialScene = urlParams.get('initialScene') || 'default_scene';
+            const hlookat = urlParams.get('hlookat') || 0;
+            const vlookat = urlParams.get('vlookat') || 0;
+            const fov = urlParams.get('fov') || 90;
+    
+            function initializeScene(krpanoInstance, sceneName, hlookat, vlookat, fov) {
+                krpanoInstance.call(`loadscene(${sceneName}, null, MERGE);`);
+                krpanoInstance.set('view.hlookat', hlookat);
+                krpanoInstance.set('view.vlookat', vlookat);
+                krpanoInstance.set('view.fov', fov);
+
+                // Set layout based on device
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
+                if (krpanoInstance.get("name") === "pano1") {
+                    // First viewer - bottom bar on left
+                    krpanoInstance.set('layer[bottom_bar].align', 'bottomleft');
+                    krpanoInstance.set('layer[bottom_bar].width', '60');
+                    krpanoInstance.set('layer[bottom_bar].x', '20');
+                    krpanoInstance.set('layer[bottom_bar].visible', true);
+                    //krpanoInstance.set('layer[qr_svg].onclick', 'handleQRCode('+krpanoInstance+');');
+                    
+                } else {
+                    //Second viewer - datetime bar on right
+                    krpanoInstance.set('layer[datetime_bar].align', 'topleft');
+                    krpanoInstance.set('layer[datetime_bar].x', '40');
+                    krpanoInstance.set('layer[datetime_bar].y', '50');
+                    
+                    krpanoInstance.set('layer[date_tooltip].x', '175');
+                    krpanoInstance.set('layer[date_tooltip].y', '10');
+                    krpanoInstance.set('layer[date_bar].height', '40');
+                    krpanoInstance.set('layer[date_bar].width', '160');
+
+                    krpanoInstance.set('layer[time_tooltip].x', '175');
+                    krpanoInstance.set('layer[time_tooltip].y', '62');
+                    krpanoInstance.set('layer[time_bar].height', '40');
+                    krpanoInstance.set('layer[time_bar].width', '160'); 
+                    krpanoInstance.set('layer[time_bar].align', 'left');
+                    krpanoInstance.set('layer[time_bar].y', '50');
+                    krpanoInstance.set('layer[time_bar].css', "font-family: Arial; color: #FFFFFF; font-size: 14px; padding: 8px 15px; display: flex; align-items: center; height:100%; justify-content:center;");
+                    
+                    krpanoInstance.set('layer[bottom_bar].width', '60');
+                    krpanoInstance.set('layer[bottom_bar].height', '225');
+
+                    krpanoInstance.set('layer[qr_tooltip].x', '70');
+                    krpanoInstance.set('layer[qr_tooltip].y', '20');
+                    krpanoInstance.set('layer[qr_button].x', '0');
+                    krpanoInstance.set('layer[qr_button].y', '10');
+                    krpanoInstance.set('layer[qr_button].align', 'top');
+
+                    krpanoInstance.set('layer[share_button].y', '65');
+                    krpanoInstance.set('layer[share_button].x', '0');
+                    krpanoInstance.set('layer[share_tooltip].x', '70');
+                    krpanoInstance.set('layer[share_tooltip].y', '75');
+                    krpanoInstance.set('layer[share_button].align', 'top');
+
+                    krpanoInstance.set('layer[add_button].y', '120');
+                    krpanoInstance.set('layer[add_button].x', '0');
+                    krpanoInstance.set('layer[add_tooltip].x', '70');
+                    krpanoInstance.set('layer[add_tooltip].y', '130');
+                    krpanoInstance.set('layer[add_button].align', 'top');
+
+                    krpanoInstance.set('layer[screenshot_button].y', '175');
+                    krpanoInstance.set('layer[screenshot_button].x', '0');
+                    krpanoInstance.set('layer[screenshot_tooltip].x', '70');
+                    krpanoInstance.set('layer[screenshot_tooltip].y', '185');
+                    krpanoInstance.set('layer[screenshot_button].align', 'top');
+                    
+                    
+                    krpanoInstance.set('layer[datetime_bar].visible', true);
+                    krpanoInstance.set('layer[calendar_popup].align', 'topleft');
+                    krpanoInstance.set('layer[calendar_popup].x', '40');
+                    krpanoInstance.set('layer[calendar_popup].y', '180');
+
+                    krpanoInstance.set('layer[calendar_popup].align', 'topleft');
+
+
+                    krpanoInstance.set('layer[time_dropdown_list].align', 'topleft');
+                    krpanoInstance.set('layer[time_dropdown_list].x', '0');
+                    krpanoInstance.set('layer[time_dropdown_list].y', '102');
+                }
+
+                // Hide split screen button
+                krpanoInstance.call(`
+                    if(layer[split_screen_button], set(layer[split_screen_button].visible, false););
+                    if(layer[close_split_button], set(layer[close_split_button].visible, true););
+                    if(layer[chatbot_button], set(layer[chatbot_button].visible, false););
+                    if(layer[trajectory_toggle_switch], set(layer[trajectory_toggle_switch].visible, false););
+                `);
+            }
+
+            function syncScenes(sourceKrpano, targetKrpano) {
+                sourceKrpano.set("events.onnewscene", function () {
+                    const newScene = sourceKrpano.get("xml.scene");
+                    // targetKrpano.call(`loadscene(${newScene}, null, MERGE);`);
+                });
+            }
+        
+            // Load the first tour
+            const currentUrlFirstTour = window.location.href;
+            const baseUrlFirstTour = currentUrlFirstTour.substring(0, currentUrlFirstTour.indexOf('/vtour'));
+            embedpano({
+                xml: `${baseUrlFirstTour}/vtour/tour.xml`,
+                target: "pano1",
+                html5: "prefer",
+                passQueryParameters: true,
+                onready: function(krpano1) {
+                    window.krpanoWrapper.krpano1 = krpano1;
+                    krpano1.set("name", "krpano1");
+                    initializeScene(krpano1, initialScene, hlookat, vlookat, fov);
+                    krpano1Ready = true;
+                    checkSyncReady();
+                    if (krpano2Ready) syncScenes(window.krpanoWrapper.krpano1, window.krpanoWrapper.krpano2);
+
+                    console.log('krpano viewer loaded.');
+
+                    // bottom_bar width 230
+                    krpano1.set('layer[bottom_bar].width', '60');
+                    krpano1.set('layer[split_button].visible', false);
+
+                    // Continue with ThreeJS initialization
+                    const intervalId = setInterval(() => {
+                        const threejsPlugin = krpano1.get('plugin[threejs]');
+                        if (threejsPlugin && threejsPlugin.scene && threejsPlugin.THREE) {
+                            clearInterval(intervalId);
+                            initializeThreeJS(krpano1);
+                            initializeFileSaver(krpano1);
+                            initializeCalendarLeft(krpano1);
+                            fetchCaptureTimeFromDateBarLeft(krpano1);
+                            setTimeDropdownIconLeft(krpano1);
+                            updateTimeBarLeft(krpano1);
+                            fetchLeftFloors(krpano1);
+                            setLeftFloorPlanContainerSizeOnLoad(krpano1);
+                            QR_URL = `${baseUrlFirstTour}/vtour/tour.html`;
+                            krpano1.set('layer[qr_svg].onclick', `js(handleQRCodeLeftViewer(${QR_URL}));`);
+                            krpano1.set('layer[share_svg].onclick', `js(handleShareButtonLeftView(${QR_URL}));`);
+                            krpano1.set('layer[datetime_display].onclick', 'js(toggleCalendarLeft());');
+                            krpano1.set('layer[prev_svg].onclick', 'js(handlePrevDateTimeLeft());');
+                            krpano1.set('layer[next_svg].onclick', 'js(handleNextDateTimeLeft());');
+                            krpano1.set('layer[prev_month_svg].onclick', 'js(handlePrevMonthLeft());');
+                            krpano1.set('layer[next_month_svg].onclick', 'js(handleNextMonthLeft());');
+                            krpano1.set('layer[expand_btn].onclick', 'js(expandFloorplanLeft());');
+                            krpano1.set('layer[collapse_btn].onclick', 'js(collapseFloorplanLeft());');
+                            krpano1.set('layer[map].ondown', 'js(handelDragFloorplanImageLeft());');
+                            krpano1.set('layer[close_split_button].onclick', `js(callCloseSplitView(left_url));`);
+                            krpano1.set('layer[close_button].onclick', `js(closeCalendarLeft());`);
+                            krpano1.set('layer[dropdown_button].onclick', `js(toggleLeftDropdown());`);
+                            krpano1.set('layer[time_bar].onclick', `js(leftTimeDropdown());`);
+                        } else {
+                            console.log('Waiting for ThreeJS plugin to be ready...');
+                        }
+                    }, 100);
+
+                }
+            });
+    
+            // Load the second tour
+            const currentUrlSecondTour = window.location.href;
+            const baseUrlSecondTour = currentUrlSecondTour.substring(0, currentUrlSecondTour.indexOf('/vtour'));
+            embedpano({
+                xml: `${baseUrlSecondTour}/vtour/tour.xml`,
+                target: "pano2",
+                html5: "prefer",
+                passQueryParameters: true,
+                onready: function(krpano2) {
+                    window.krpanoWrapper.krpano2 = krpano2;
+                    krpano2.set("name", "krpano2");
+                    initializeScene(krpano2, initialScene, hlookat, vlookat, fov);
+                    krpano2Ready = true;
+                    checkSyncReady();
+                    if (krpano1Ready) syncScenes(window.krpanoWrapper.krpano2, window.krpanoWrapper.krpano1);
+
+                    console.log('krpano viewer loaded.');
+
+                    // bottom_bar width 230
+                    krpano2.set('layer[bottom_bar].width', '60');
+                    krpano2.set('layer[split_button].visible', false);
+
+                    // Continue with ThreeJS initialization
+                    const intervalId = setInterval(() => {
+                        const threejsPlugin = krpano2.get('plugin[threejs]');
+                        if (threejsPlugin && threejsPlugin.scene && threejsPlugin.THREE) {
+                            clearInterval(intervalId);
+                            initializeThreeJS(krpano2);
+                            initializeFileSaver(krpano2);
+                            initializeCalendarRight(krpano2);
+                            fetchCaptureTimeFromDateBarRight(krpano2);
+                            setTimeDropdownIconRight(krpano2);
+                            updateTimeBarRight(krpano2);
+                            fetchRightFloors(krpano2);
+                            setRightFloorPlanContainerSizeOnLoad(krpano2);
+                            QR_URL = `${baseUrlSecondTour}/vtour/tour.html`,
+                            krpano2.set('layer[qr_svg].onclick', `js(handleQRCodeRightViewer(${QR_URL}));`);
+                            krpano2.set('layer[share_svg].onclick', `js(handleShareButtonRightView(${QR_URL}));`);
+                            krpano2.set('layer[datetime_display].onclick', 'js(toggleCalendarRight());');
+                            krpano2.set('layer[prev_svg].onclick', 'js(handlePrevDateTimeRight());');
+                            krpano2.set('layer[next_svg].onclick', 'js(handleNextDateTimeRight());');
+                            krpano2.set('layer[prev_month_svg].onclick', 'js(handlePrevMonthRight());');
+                            krpano2.set('layer[next_month_svg].onclick', 'js(handleNextMonthRight());');
+                            krpano2.set('layer[expand_btn].onclick', 'js(expandFloorplanRight());');
+                            krpano2.set('layer[collapse_btn].onclick', 'js(collapseFloorplanRight());');
+                            krpano2.set('layer[map].ondown', 'js(handelDragFloorplanImageRight());');
+                            krpano2.set('layer[close_split_button].onclick', `js(callCloseSplitView(right_url));`);
+                            krpano2.set('layer[close_button].onclick', `js(closeCalendarRight());`);
+                            krpano2.set('layer[dropdown_button].onclick', `js(toggleRightDropdown());`);
+                            krpano2.set('layer[time_bar].onclick', `js(rightTimeDropdown());`);
+                        } else {
+                            console.log('Waiting for ThreeJS plugin to be ready...');
+                        }
+                    }, 100);
+
+                }
+            });
+        }
+    
+        function checkSyncReady() {
+            if (krpano1Ready && krpano2Ready) {
+                console.log("Both viewers are ready for syncing.");
+            }
+        }
+    </script>
+
+
+    <script>
+        function callCloseSplitView(url) {
+            // const currentUrl = window.location.href;
+            let currentUrl;
+            if (url == "left_url"){
+                currentUrl = right_url
+            } else{
+                currentUrl = left_url
+            }
+            const baseUrl = currentUrl.substring(0, currentUrl.indexOf('/vtour'));
+            window.location.href = `${baseUrl}/vtour/tour.html`;
+        }
+    </script>
+
+</body>
+</html>

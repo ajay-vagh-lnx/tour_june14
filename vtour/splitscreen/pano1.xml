@@ -1,0 +1,19 @@
+<krpano>
+
+	<include url="sync.xml" />
+
+	<image>
+		<cube url="../panos/scene_1.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg" multires="512,512" />
+	</image>
+	
+	<layer name="info"
+		type="text"
+		html="Before"
+		css="font-size:24px; font-weight:vold; color:#FFFFFF;"
+		bg="false"
+		txtshadow="0 2 4 0x000000 1.0"
+		align="bottom" y="50"
+		enabled="false"
+		/>
+
+</krpano>
