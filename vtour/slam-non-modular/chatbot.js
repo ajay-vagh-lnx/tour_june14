@@ -263,8 +263,8 @@ function openChatBot() {
     thisSceneButton.dataset.value = "scene";
 
     // Add buttons to the button header with space between
-    buttonHeader.appendChild(fullTourButton);
     buttonHeader.appendChild(thisSceneButton);
+    buttonHeader.appendChild(fullTourButton);
 
     // Button click handlers - mutually exclusive active state
     const headerButtons = [fullTourButton, thisSceneButton];
@@ -379,47 +379,16 @@ function openChatBot() {
             return;
         }
 
+        // Add skeleton class and clear chat body to prevent overlap
+        const chatBody = document.getElementById("chat-body");
+        if (chatBody) {
+            chatBody.classList.add('skeleton');
+            chatBody.innerHTML = ''; // Clear content immediately
+        }
+
         try {
             // Get current sessions
             const sessions = await getSessions(captureId);
-
-            //         if (sessions.length >= 3) {
-
-            //             if (isMobileView()) {
-            //                 // Mobile version
-            //                 mobilePopup.innerHTML = `
-            //     <div class="mobile-popup-content" style="background-color: #3498db; color: white;">
-            //         <div class="mobile-popup-message" style="color: white;">You can only have up to 3 chat sessions.</div>
-            //     </div>
-            // `;
-            //                 mobilePopup.style.display = 'flex';
-
-            //                 setTimeout(() => {
-            //                     mobilePopup.style.display = 'none';
-            //                 }, 1500);
-            //             } else {
-            //                 // Desktop version (your existing code)
-            //                 const popupAlert = document.querySelector(".popup-alert");
-            //                 popupAlert.textContent = "You can only have up to 3 chat sessions.";
-            //                 popupAlert.style.display = 'flex';
-            //                 popupAlert.style.opacity = '1';
-            //                 popupAlert.style.alignItems = 'center';
-            //                 popupAlert.style.justifyContent = 'center';
-            //                 popupAlert.style.color = 'black';
-            //                 popupAlert.style.backgroundColor = '#3498db';
-            //                 popupAlert.style.color = 'white';
-            //                 popupAlert.style.transition = 'opacity 0.5s ease';
-
-            //                 setTimeout(() => {
-            //                     popupAlert.style.opacity = '0';
-            //                     setTimeout(() => {
-            //                         popupAlert.style.display = 'none';
-            //                         popupAlert.style.opacity = '1';
-            //                     }, 500);
-            //                 }, 3000);
-            //             }
-            //             return;
-            //         }
 
 
             // Create new session
@@ -429,6 +398,7 @@ function openChatBot() {
 
             if (!createdSession?.id) {
                 console.error('Failed to create new chat session');
+                chatBody.classList.remove('skeleton'); // Remove skeleton on failure
                 return;
             }
 
@@ -449,9 +419,13 @@ function openChatBot() {
 
             showIntroMessage();
 
+            // Remove skeleton class after content is loaded
+            chatBody.classList.remove('skeleton');
+
             console.log('New chat session created and sidebar updated');
         } catch (error) {
             console.error('Error handling new chat session:', error);
+            if (chatBody) chatBody.classList.remove('skeleton');
         }
     });
 
@@ -623,7 +597,7 @@ function openChatBot() {
     // Expand functionality
     let isExpanded = false;
     const initialChatContainerStyles = {
-        height: '500px',
+        height: '530px',
         width: '480px',
         zIndex: '999'
     };
@@ -639,8 +613,8 @@ function openChatBot() {
     const expandedChatBodyHeight = '614px';
 
     // SIDEBAR PANEL HISROTY ITEMS
-    const historyContainerHeightInitial = '410px'
-    const historyContainerHeightExpanded = '600px'
+    const historyContainerHeightInitial = '440px'
+    const historyContainerHeightExpanded = '610px'
 
     function toggleExpand() {
         const chatContainer = document.querySelector('.chat-container');
@@ -2937,6 +2911,11 @@ async function updateSidebarSessions(captureId) {
                 return;
             }
 
+            // Add skeleton class and clear chat content to prevent overlap
+            const chatBody = document.getElementById('chat-body');
+            chatBody.classList.add('skeleton');
+            chatBody.innerHTML = ''; // Clear existing content to avoid overlap
+
             const success = await deleteSession(session.id);
 
             if (success) {
@@ -2946,7 +2925,7 @@ async function updateSidebarSessions(captureId) {
                     // Mobile version - ADDED NEW CODE
                     mobilePopup.innerHTML = `
             <div class="mobile-popup-content">
-                <div class="mobile-popup-message">Session deleted.</div>
+                <div class="mobile-popup-message">Chat deleted.</div>
             </div>
         `;
                     mobilePopup.style.display = 'flex';
@@ -2955,7 +2934,7 @@ async function updateSidebarSessions(captureId) {
                     }, 1500);
                 } else {
                     // Desktop version - EXISTING CODE PRESERVED EXACTLY
-                    popupAlert.innerHTML = `<div>Session deleted.</div>`;
+                    popupAlert.innerHTML = `<div>Chat deleted.</div>`;
                     popupAlert.style.display = 'flex';
                     popupAlert.style.justifyContent = 'center';
                     popupAlert.style.alignItems = 'center';
@@ -2973,10 +2952,12 @@ async function updateSidebarSessions(captureId) {
                     await updateSidebarSessions(captureId);
                     clearChatMessages();
                     fetchChatHistory(currentSessionId, captureId);
+                    chatBody.classList.remove('skeleton');
                 } else {
                     console.warn("No sessions left after deletion.");
                     clearChatMessages();
                     await updateSidebarSessions(captureId);
+                    chatBody.classList.remove('skeleton');
                 }
             } else {
                 if (isMobileView()) {
@@ -2996,6 +2977,7 @@ async function updateSidebarSessions(captureId) {
                     popupAlert.style.display = 'flex';
                     popupAlert.style.opacity = '1';
                 }
+                chatBody.classList.remove('skeleton');
             }
 
             // Auto-hide after 3 seconds (desktop only - existing code preserved exactly)
@@ -3179,9 +3161,28 @@ async function updateSidebarSessions(captureId) {
         historyContainer.appendChild(historyItem);
 
 
+        // itemContent.addEventListener('click', async function () {
+        //     const sidebarHide = document.querySelector('.sidebar-hide')
+        //     // sidebarHide.click();
+        //     currentSessionId = session.id;
+
+        //     // Remove active class from all items first
+        //     document.querySelectorAll('.history-item').forEach(item => {
+        //         item.classList.remove('active');
+        //     });
+
+        //     // Highlight the current clicked one
+        //     historyItem.classList.add('active');
+
+        //     // Clear current chat UI (optional, depends on your structure)
+        //     clearChatMessages(); // implement this if needed
+
+        //     fetchChatHistory(currentSessionId, captureId);
+
+        // });
+
         itemContent.addEventListener('click', async function () {
-            const sidebarHide = document.querySelector('.sidebar-hide')
-            // sidebarHide.click();
+            const sidebarHide = document.querySelector('.sidebar-hide');
             currentSessionId = session.id;
 
             // Remove active class from all items first
@@ -3192,11 +3193,26 @@ async function updateSidebarSessions(captureId) {
             // Highlight the current clicked one
             historyItem.classList.add('active');
 
-            // Clear current chat UI (optional, depends on your structure)
-            clearChatMessages(); // implement this if needed
+            // Add skeleton class and clear chat body to prevent overlap
+            const chatBody = document.getElementById('chat-body');
+            if (chatBody) {
+                chatBody.classList.add('skeleton');
+                chatBody.innerHTML = ''; // Clear content immediately
+            }
 
-            fetchChatHistory(currentSessionId, captureId);
+            try {
+                // Clear current chat UI
+                clearChatMessages(); // Optional, may be redundant with innerHTML clear
 
+                // Fetch and load chat history
+                await fetchChatHistory(currentSessionId, captureId);
+
+                // Remove skeleton class after content is loaded
+                if (chatBody) chatBody.classList.remove('skeleton');
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+                if (chatBody) chatBody.classList.remove('skeleton'); // Remove skeleton on error
+            }
         });
 
     });

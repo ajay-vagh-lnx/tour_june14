@@ -45,8 +45,8 @@
   width: 70%; /*70%*/
   min-height: 40px;
   background-color: #dfff60;
-  top: 10%;
-  left: 46%;
+  top: 15%;
+  left: 50%;
   transform: translateX(-50%);
   border-radius: 10px;
   display: none;
@@ -258,7 +258,7 @@
   position: absolute; /* fixed or abs */
   bottom: 10px;
   right: 10px;
-  height: 500px;
+  height: 530px;
   width: 480px;
   background: white;
   border: 1px solid #ccc;
@@ -348,7 +348,9 @@
     border-radius: 10px;
     border-top-left-radius: 0px;
   }
-  
+  .chat-body.skeleton > * {
+    display: none; /* Hide all child elements when skeleton is active */
+}
   /* Repeating 3-line blocks for chat body skeleton */
   .chat-body.skeleton::before {
     content: "";
@@ -395,8 +397,8 @@
     content: "";
     position: absolute;
     top: 15px;
-    left: 15px;
-    right: 15px;
+    left: 10px;
+    right: 10px;
     height: 30px;
     background: rgba(255,255,255,0.8);
     border-radius: 5px;
@@ -617,7 +619,7 @@ textarea {
 
 .history-container {
   /* padding: 10px; */
-  max-height: 410px; /* or whatever fits your design */
+  max-height: 440px; /* or whatever fits your design */
   overflow-y: auto;    
   height: 100%;
   scrollbar-width: thin;
