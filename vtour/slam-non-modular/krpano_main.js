@@ -777,6 +777,7 @@ window.isDateAvailable = function (dateToCheck) {
         if (isSameDate) {
             console.log('Found matching date:', tourDate);
             hideLoader();
+            showLoadPopUp();
         }
         return isSameDate;
     });
@@ -784,6 +785,110 @@ window.isDateAvailable = function (dateToCheck) {
     return isAvailable;
 }
 
+
+// --------------------------------------------
+// Function to show the loading popup
+function showLoadPopUp() {
+    const popup = document.createElement('div');
+    popup.id = 'loadPopUp';
+    
+    const message = document.createElement('div');
+    message.textContent = 'Please allow a few seconds for image to load clearly…';
+    message.style.color = 'white';
+    message.style.fontWeight = '700';
+    message.style.lineHeight = '1.2';
+    message.style.display = 'inline-block'; // Changed to inline-block for dynamic width
+
+    // Base styling
+    popup.style.position = 'fixed';
+    popup.style.left = '50%';
+    popup.style.transform = 'translateX(-50%)';
+    popup.style.backgroundColor = '#3498db';
+    popup.style.color = 'white';
+    popup.style.padding = '10px 15px';
+    popup.style.borderRadius = '20px';
+    popup.style.fontFamily = 'Arial, sans-serif';
+    popup.style.fontWeight = '700';
+    popup.style.zIndex = '999';
+    popup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    popup.style.transition = 'opacity 0.3s ease';
+    popup.style.opacity = '0';
+    popup.style.animation = 'fadeIn 0.3s forwards';
+    popup.style.textAlign = 'center';
+    popup.style.display = 'inline-block'; // Makes width fit content
+    popup.style.whiteSpace = 'nowrap'; // Prevents natural line breaks
+
+    // Mobile-specific adjustments
+    if (window.innerWidth <= 576) {
+        popup.style.top = '35%';
+        popup.style.fontSize = '13px';
+        popup.style.whiteSpace = 'normal'; // Allow our forced line breaks
+        
+        // Calculate optimal two-line split
+        const text = message.textContent;
+        const spaceIndices = [];
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === ' ') spaceIndices.push(i);
+        }
+        
+        // Find the space closest to middle
+        const middle = text.length / 2;
+        let bestSplit = 0;
+        let minDiff = Infinity;
+        spaceIndices.forEach(pos => {
+            const diff = Math.abs(pos - middle);
+            if (diff < minDiff) {
+                minDiff = diff;
+                bestSplit = pos;
+            }
+        });
+        
+        // Apply the two-line split
+        message.innerHTML = text.substring(0, bestSplit) + '<br>' + text.substring(bestSplit + 1);
+        
+        // Calculate required width
+        const temp = document.createElement('div');
+        temp.style.position = 'absolute';
+        temp.style.visibility = 'hidden';
+        temp.style.whiteSpace = 'nowrap';
+        temp.style.fontSize = '13px';
+        temp.style.fontFamily = 'Arial, sans-serif';
+        temp.style.fontWeight = '700';
+        
+        // Measure both lines
+        const line1 = text.substring(0, bestSplit);
+        const line2 = text.substring(bestSplit + 1);
+        temp.textContent = line1.length > line2.length ? line1 : line2;
+        document.body.appendChild(temp);
+        const requiredWidth = temp.offsetWidth + 30; // Add padding
+        document.body.removeChild(temp);
+        
+        // Apply calculated width
+        popup.style.width = Math.min(requiredWidth, window.innerWidth * 0.9) + 'px';
+    } else {
+        // Desktop styling
+        popup.style.top = '10%';
+        popup.style.fontSize = '14px';
+    }
+
+    // Animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; } }
+    `;
+    document.head.appendChild(style);
+    
+    popup.appendChild(message);
+    document.body.appendChild(popup);
+    
+    setTimeout(() => popup.style.opacity = '1', 10);
+    setTimeout(() => {
+        popup.style.animation = 'fadeOut 0.3s forwards';
+        setTimeout(() => popup.remove(), 300);
+    }, 15000);
+}
+// -------------------------------------------------
 window.handlePrevDateTime = async function () {
     const krpano = document.getElementById("krpanoSWFObject");
     if (!krpano || !window.tourData?.dates) return;

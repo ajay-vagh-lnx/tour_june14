@@ -582,7 +582,7 @@ function openChatBot() {
 
     // chat_container.appendChild(chat_header);
     rightColumn.appendChild(chat_header);
-    rightColumn.appendChild(buttonHeader)
+    // rightColumn.appendChild(buttonHeader)
 
     const chat_body = document.createElement('div');
     chat_body.classList.add('chat-body');
@@ -2362,7 +2362,24 @@ function openChatBot() {
             const blob = await Packer.toBlob(doc);
             const safeName = projectName.replace(/[^a-z0-9]/gi, "_").substring(0, 50);
             const filename = `SitePace_Chat_${safeName}_${Date.now()}.docx`;
-            saveAs(blob, filename);
+
+            // Only modification: Flutter app detection wrapper
+            if (window.flutterInAppWebView) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    const base64data = reader.result.split(',')[1];
+                    window.flutterInAppWebView.callHandler('saveFile', {
+                        filename: filename,
+                        data: base64data,
+                        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    });
+                };
+                reader.readAsDataURL(blob);
+            } else {
+                // Original save behavior remains unchanged
+                saveAs(blob, filename);
+            }
+
             document.querySelector(".delete-popup").style.display = 'none';
             console.log("✅ DOCX export complete:", filename);
         } catch (err) {
@@ -2752,7 +2769,20 @@ function openChatBot() {
 
 
 
-        pdf.save(`SitePace_Chat_Transcript_${projectName.replace(/\s+/g, "_")}.pdf`);
+        // Only modification: Flutter app detection
+        if (window.flutterInAppWebView) {
+            const pdfOutput = pdf.output('datauristring');
+            const base64Data = pdfOutput.split(',')[1];
+            window.flutterInAppWebView.callHandler('saveFile', {
+                filename: `SitePace_Chat_Transcript_${projectName.replace(/\s+/g, "_")}.pdf`,
+                data: base64Data,
+                mimeType: 'application/pdf'
+            });
+        } else {
+            // Your original save code remains EXACTLY the same
+            pdf.save(`SitePace_Chat_Transcript_${projectName.replace(/\s+/g, "_")}.pdf`);
+        }
+
         document.querySelector(".delete-popup").style.display = 'none';
     }
 
