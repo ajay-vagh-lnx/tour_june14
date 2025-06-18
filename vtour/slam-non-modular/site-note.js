@@ -605,7 +605,7 @@ function createSitenoteModal() {
             container.style.touchAction = "none";
             container.style.position = "relative";
             container.style.cursor = "grab";
-            image.style.transformOrigin = "top left";
+            // image.style.transformOrigin = "top left";
             image.style.transform = `scale(${currentZoom})`;
             image.style.pointerEvents = "none";
 
@@ -613,6 +613,14 @@ function createSitenoteModal() {
             image.onload = function () {
                 imgWidth = this.naturalWidth;
                 imgHeight = this.naturalHeight;
+ 
+                if (imgHeight > imgWidth) {
+                    // Portrait
+                    image.style.transformOrigin = "top center";
+                } else {
+                    // Landscape
+                    image.style.transformOrigin = "top left";
+                }
             };
             if (image.complete) image.onload();
 
