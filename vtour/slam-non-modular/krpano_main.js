@@ -777,7 +777,8 @@ window.isDateAvailable = function (dateToCheck) {
         if (isSameDate) {
             console.log('Found matching date:', tourDate);
             hideLoader();
-            showLoadPopUp();
+            setTimeout(() => showLoadPopUp(), 500)
+            // showLoadPopUp();
         }
         return isSameDate;
     });
@@ -793,45 +794,44 @@ function showLoadPopUp() {
     popup.id = 'loadPopUp';
     
     const message = document.createElement('div');
-    message.textContent = 'Please allow a few seconds for image to load clearly…';
-    message.style.color = 'white';
-    message.style.fontWeight = '700';
+    message.textContent = 'Loading high-resolution view… This may take few seconds.';
+    message.style.color = '#333'; // Black text for contrast
+    // message.style.fontWeight = '700';
     message.style.lineHeight = '1.2';
-    message.style.display = 'inline-block'; // Changed to inline-block for dynamic width
+    message.style.display = 'inline-block';
 
-    // Base styling
+    // Base styling (pill-shaped container)
     popup.style.position = 'fixed';
     popup.style.left = '50%';
     popup.style.transform = 'translateX(-50%)';
-    popup.style.backgroundColor = '#3498db';
-    popup.style.color = 'white';
-    popup.style.padding = '10px 15px';
-    popup.style.borderRadius = '20px';
+    popup.style.backgroundColor = 'rgba(207, 255, 177, 0.1)'; // Vibrant green (unchanged)
+    popup.style.padding = '10px 25px'; // Wider padding for pill shape
+    popup.style.borderRadius = '100px'; // Pill shape (high value)
     popup.style.fontFamily = 'Arial, sans-serif';
-    popup.style.fontWeight = '700';
-    popup.style.zIndex = '999';
-    popup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    // popup.style.fontWeight = '700';
+    popup.style.zIndex = '9999';
+    // popup.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'; // Softer shadow
     popup.style.transition = 'opacity 0.3s ease';
     popup.style.opacity = '0';
-    popup.style.animation = 'fadeIn 0.3s forwards';
+    popup.style.animation = 'fadeIn 0.5s forwards';
     popup.style.textAlign = 'center';
-    popup.style.display = 'inline-block'; // Makes width fit content
-    popup.style.whiteSpace = 'nowrap'; // Prevents natural line breaks
+    popup.style.display = 'inline-block';
+    popup.style.whiteSpace = 'nowrap';
+    // popup.style.opacity = '0.10'; // Added semi-transparency (you can adjust 0.85 to your liking)
 
-    // Mobile-specific adjustments
+    // Mobile adjustments
     if (window.innerWidth <= 576) {
-        popup.style.top = '35%';
+        popup.style.bottom = '15%';
         popup.style.fontSize = '13px';
-        popup.style.whiteSpace = 'normal'; // Allow our forced line breaks
+        popup.style.whiteSpace = 'normal';
+        popup.style.padding = '8px 20px'; // Slightly smaller padding on mobile
         
-        // Calculate optimal two-line split
+        // Split text into two lines (your existing logic)
         const text = message.textContent;
         const spaceIndices = [];
         for (let i = 0; i < text.length; i++) {
             if (text[i] === ' ') spaceIndices.push(i);
         }
-        
-        // Find the space closest to middle
         const middle = text.length / 2;
         let bestSplit = 0;
         let minDiff = Infinity;
@@ -842,11 +842,9 @@ function showLoadPopUp() {
                 bestSplit = pos;
             }
         });
-        
-        // Apply the two-line split
         message.innerHTML = text.substring(0, bestSplit) + '<br>' + text.substring(bestSplit + 1);
         
-        // Calculate required width
+        // Measure width for responsiveness
         const temp = document.createElement('div');
         temp.style.position = 'absolute';
         temp.style.visibility = 'hidden';
@@ -854,24 +852,20 @@ function showLoadPopUp() {
         temp.style.fontSize = '13px';
         temp.style.fontFamily = 'Arial, sans-serif';
         temp.style.fontWeight = '700';
-        
-        // Measure both lines
         const line1 = text.substring(0, bestSplit);
         const line2 = text.substring(bestSplit + 1);
         temp.textContent = line1.length > line2.length ? line1 : line2;
         document.body.appendChild(temp);
-        const requiredWidth = temp.offsetWidth + 30; // Add padding
+        const requiredWidth = temp.offsetWidth + 40; // Extra padding
         document.body.removeChild(temp);
-        
-        // Apply calculated width
-        popup.style.width = Math.min(requiredWidth, window.innerWidth * 0.9) + 'px';
+        popup.style.width = Math.min(requiredWidth, window.innerWidth * 0.85) + 'px';
     } else {
         // Desktop styling
-        popup.style.top = '10%';
+        popup.style.bottom = '20%';
         popup.style.fontSize = '14px';
     }
 
-    // Animation styles
+    // Add fade animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes fadeIn { to { opacity: 1; } }
@@ -879,13 +873,15 @@ function showLoadPopUp() {
     `;
     document.head.appendChild(style);
     
+    // Append and show
     popup.appendChild(message);
     document.body.appendChild(popup);
-    
     setTimeout(() => popup.style.opacity = '1', 10);
+    
+    // Auto-dismiss after 15 seconds
     setTimeout(() => {
-        popup.style.animation = 'fadeOut 0.3s forwards';
-        setTimeout(() => popup.remove(), 300);
+        popup.style.animation = 'fadeOut 0.5s forwards';
+        setTimeout(() => popup.remove(), 500);
     }, 15000);
 }
 // -------------------------------------------------

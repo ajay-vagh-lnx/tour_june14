@@ -461,7 +461,11 @@ function openChatBot() {
         sidebarHide.style.display = 'inline-block';
 
         if (window.innerWidth < 576) {
-            document.querySelector('.header-left').style.visibility = 'hidden';
+            document.querySelector('.header-left').style.visibility = 'hidden'; leftColumn.style.position = 'absolute';
+            leftColumn.style.zIndex = '1001';
+            leftColumn.style.height = '100%';
+            leftColumn.style.boxShadow = '2px 0 5px rgba(0,0,0,0.1)';
+            rightColumn.style.marginLeft = '0';
         }
     });
 
@@ -480,6 +484,10 @@ function openChatBot() {
 
         if (window.innerWidth < 576) {
             document.querySelector('.header-left').style.visibility = 'visible';
+            leftColumn.style.position = '';
+            leftColumn.style.zIndex = '';
+            leftColumn.style.height = '';
+            leftColumn.style.boxShadow = '';
         }
 
 
@@ -609,7 +617,7 @@ function openChatBot() {
     };
 
     // Store initial chat body height
-    const initialChatBodyHeight = '414px';
+    const initialChatBodyHeight = '450px';
     const expandedChatBodyHeight = '614px';
 
     // SIDEBAR PANEL HISROTY ITEMS
